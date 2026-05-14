@@ -1,2 +1,39 @@
+# Dependências
 node_modules/
+**/node_modules/
+
+# Variáveis de ambiente
 .env
+**/.env
+!**/.env.example
+
+# Build outputs
+dist/
+build/
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+
+# Docker volumes (não commitir)
+postgres_data/
+redis_data/
+
+# Diretório legado (projeto foi movido para knowflow-v1/)
+2025-1-p3-tiapn-si-grupo-1/
