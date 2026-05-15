@@ -340,24 +340,6 @@ const FlowEditor = () => {
 
   const progress = (currentStep / 3) * 100;
 
-  const addChecklistItem = () => {
-    setNodeData((prev) => ({
-      ...prev,
-      items: [...(prev.items || []), { id: Date.now().toString(), label: '', done: false }],
-    }));
-  };
-
-  const removeChecklistItem = (itemId) => {
-    setNodeData((prev) => ({ ...prev, items: prev.items.filter((i) => i.id !== itemId) }));
-  };
-
-  const updateChecklistItem = (itemId, label) => {
-    setNodeData((prev) => ({
-      ...prev,
-      items: prev.items.map((i) => (i.id === itemId ? { ...i, label } : i)),
-    }));
-  };
-
   return (
     <S.Container>
       <S.Header>

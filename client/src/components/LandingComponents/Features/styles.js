@@ -1,110 +1,125 @@
-import styled from "styled-components"
-import { Split } from "lucide-react";
-import { CirclePlus } from 'lucide-react';
-import { Users } from 'lucide-react';
+import styled from "styled-components";
 
-export const RotatedSplit = styled(Split)`
-  transform: rotate(90deg);
-  color: #233DFF;
-  width:32px;
-  height: 32px;
-  stroke-width: 2.5;
-  margin-bottom: 15px;
-`
+export const FeaturesSection = styled.section`
+  padding: 100px 24px;
+  background: #fff;
+  position: relative;
 
-export const Circleplus = styled(CirclePlus)`
-  color: #233DFF;
-  width:32px;
-  height: 32px;
-  stroke-width: 2.5;
-  margin-bottom: 15px;
-
-`
-
-export const UsersStyle = styled(Users)`
-  color: #233DFF;
-  width:32px;
-  height: 32px;
-  stroke-width: 2.5;
-  margin-bottom: 15px;
-`
-
-export const FeaturesContainer = styled.section`
-
-`
-
-export const Diferencial = styled.h1`
+  &::before {
+    content: "";
     position: absolute;
-    top: 0; /* alinha com o topo da ProgressLine */
-    left: 50px; /* dá espaço da linha até o vídeo */
-    background-color: #fff;
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    z-index: 2;
-    margin-top: 1000px;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 0, 0, 0.07) 20%,
+      rgba(0, 0, 0, 0.07) 80%,
+      transparent
+    );
+  }
+`;
+
+export const FeaturesInner = styled.div`
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+`;
+
+export const FeaturesHeader = styled.div`
+  text-align: center;
+  margin-bottom: 64px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+export const FeaturesEyebrow = styled.div`
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #233dff;
+  margin-bottom: 16px;
+`;
+
+export const FeaturesTitle = styled.h2`
+  font-family: "Source Serif 4", "Georgia", serif;
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 700;
+  color: #1d1d1f;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+
+  em {
+    font-style: italic;
+    color: #233dff;
     font-weight: 400;
-    font-size: 2.3rem;
-`
+  }
+`;
 
-//columns
+export const FeaturesSubtitle = styled.p`
+  font-size: 16px;
+  color: #6e6e73;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+`;
 
-export const ThreeColumnContainer = styled.div`
-    justify-content: space-between;
-    display: flex;
-    position: absolute;
-    top: 0; /* alinha com o topo da ProgressLine */
-    left: 20px; /* dá espaço da linha até o vídeo */
-    gap: 5rem;;
-    padding: 2rem;
-    z-index: 2;
-    margin-top: 72rem;
-    width: 90%;
-`
+export const FeaturesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 
-export const Card = styled.div`
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 2rem;
-  width: 400px;
-  height: 370px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  text-align: left;
-  border: 1px solid #eee;
-  transition: transform 0.2s ease;
-  align-items: flex-start;
-  padding-top: 9rem;
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 580px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const FeatureCard = styled.div`
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 16px;
+  padding: 28px;
+  cursor: default;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 
   &:hover {
-    transform: translateY(-5px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.10);
+    background: #fff;
   }
+`;
 
-  p {
-    font-size: 1rem;
-    color: #333;
-    line-height: 1.5;
-  }
-`
+export const FeatureIconBox = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+`;
 
-export const DescriptionF = styled.div`
-  position: absolute;
-  top: 103rem;
-  right: 10rem;
+export const FeatureCardTitle = styled.h3`
   font-size: 16px;
-  font-weight: 500;
-  max-width: 450px;
-  text-align: center;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+`;
 
-`
-export const HorizontalLine2 = styled.div`
-  position: absolute;
-  top: 1375px;
-  right: 20rem;
-  height: 4px;
-  width: 1750px; /* largura final fixa */
-  background-color: blue;
-  z-index: 0;
-  transform: scaleX(0); /* começa invisível */
-  transform-origin: right; /* cresce da direita para a esquerda */
-  transition: transform 0.1s ease-out;
+export const FeatureCardDesc = styled.p`
+  font-size: 14px;
+  color: #6e6e73;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
 `;

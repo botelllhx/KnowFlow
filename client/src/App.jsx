@@ -25,7 +25,7 @@ function LayoutWrapper() {
   return (
     <div
       className="app-container"
-      style={{ paddingLeft: hideSidebar ? "0" : "60px" }}
+      style={{ paddingLeft: hideSidebar ? "0" : "64px" }}
     >
       <Toaster richColors position="top-right" />
       {!hideSidebar && <Sidebar />}

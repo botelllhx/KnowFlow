@@ -9,6 +9,10 @@ const base = {
   dialect: process.env.DATABASE_DIALECT || "postgres",
 };
 
+/** Postgres local (Docker) não usa SSL; Azure/RDS costumam exigir. */
+const productionUsesSsl =
+  process.env.DATABASE_SSL !== "false" && process.env.DATABASE_SSL !== "0";
+
 module.exports = {
   development: {
     ...base,
@@ -18,9 +22,11 @@ module.exports = {
   },
   production: {
     ...base,
-    dialectOptions: {
-      ssl: { require: true, rejectUnauthorized: false },
-    },
+    ...(productionUsesSsl && {
+      dialectOptions: {
+        ssl: { require: true, rejectUnauthorized: false },
+      },
+    }),
   },
   test: {
     ...base,

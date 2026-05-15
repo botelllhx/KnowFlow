@@ -5,7 +5,7 @@ module.exports = {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
-        defaultValue: Sequelize.literal("uuid_generate_v4()"),
+        defaultValue: Sequelize.literal("gen_random_uuid()"),
         allowNull: false,
       },
       flow_id: {

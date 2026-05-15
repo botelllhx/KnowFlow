@@ -21,8 +21,10 @@ services:
     image: redis:7-alpine
     container_name: knowflow-redis
     restart: unless-stopped
+    # Host 6380 evita conflito com outro Redis/serviço já na 6379 (ex.: Redis local).
+    # Dentro da rede Compose o serviço continua em redis:6379 (REDIS_URL do server).
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -42,7 +44,13 @@ services:
     environment:
       NODE_ENV: production
       PGHOST: postgres
+      PGUSER: ${PGUSER:-knowflow}
+      PGPASSWORD: ${PGPASSWORD:-knowflow_secret}
+      PGDATABASE: ${PGDATABASE:-knowflow}
+      PGPORT: "5432"
       REDIS_URL: redis://redis:6379
+      # Postgres do Compose não aceita SSL (evita "does not support SSL connections").
+      DATABASE_SSL: "false"
     ports:
       - "3000:3000"
     depends_on:

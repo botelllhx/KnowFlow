@@ -12,31 +12,6 @@ import StatisticsBoard from "../../components/StatisticsBoard";
 import { useFlowStore } from "../../store/flowStore";
 import api from "../../services/api";
 
-import {
-  PageContainer,
-  PageHeader,
-  HeaderTop,
-  HeaderTitle,
-  PageTitle,
-  PageSubtitle,
-  HeaderActions,
-  CreateButton,
-  SearchArea,
-  PageMain,
-  FeedColumn,
-  SidebarColumn,
-  SectionTabs,
-  SectionTab,
-  FlowList,
-  SectionLabel,
-  SectionCount,
-  SkeletonCard,
-  SkeletonLine,
-  PeriodFilter,
-  PeriodChip,
-  LoadMoreButton,
-} from "./style";
-
 const PAGE_SIZE = 5;
 
 const SECTIONS = [
@@ -113,13 +88,9 @@ export default function Feed() {
     if (activeSection === "discussoes") return [];
     switch (activeSection) {
       case "alta":
-        return [...periodFiltered].sort(
-          (a, b) => engagementScore(b) - engagementScore(a)
-        );
+        return [...periodFiltered].sort((a, b) => engagementScore(b) - engagementScore(a));
       case "recentes":
-        return [...periodFiltered].sort(
-          (a, b) => new Date(b.criado_em) - new Date(a.criado_em)
-        );
+        return [...periodFiltered].sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
       case "equipe":
         return [...periodFiltered]
           .filter((f) => f.criado_por !== userId)
@@ -149,63 +120,90 @@ export default function Feed() {
   const hasMore = visibleCount < allItems.length;
 
   return (
-    <PageContainer>
-      <PageHeader>
-        <HeaderTop>
-          <HeaderTitle>
-            <PageTitle>Flow Network</PageTitle>
-            <PageSubtitle>
+    <div className="flex flex-col min-h-screen p-7 gap-5">
+
+      {/* Header panel */}
+      <header className="flex flex-col bg-white border border-black/[0.07] rounded-2xl p-6 gap-4 shadow-card">
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex flex-col gap-1">
+            <h1 className="font-serif text-[26px] font-bold text-[#1D1D1F] tracking-[-0.02em] leading-tight">
+              Flow Network
+            </h1>
+            <p className="text-[14px] text-[#6E6E73] leading-normal tracking-[-0.01em]">
               Conhecimento operacional vivo — explore, reutilize e contribua
-            </PageSubtitle>
-          </HeaderTitle>
-          <HeaderActions>
-            <CreateButton onClick={() => navigate("/criar-flow")}>
+            </p>
+          </div>
+          <div className="flex items-center gap-2.5 flex-shrink-0">
+            <button
+              onClick={() => navigate("/criar-flow")}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#233DFF] hover:bg-[#1A2ECC] text-white border-0 rounded-[10px] text-[13.5px] font-semibold cursor-pointer tracking-[-0.01em] transition-all duration-150 shadow-brand hover:shadow-brand-hover hover:-translate-y-px active:translate-y-0"
+            >
               <Plus size={15} strokeWidth={2.5} />
               Criar Flow
-            </CreateButton>
-          </HeaderActions>
-        </HeaderTop>
+            </button>
+          </div>
+        </div>
 
-        <SearchArea>
+        <div className="flex flex-col gap-3">
           <SearchBar />
           <Categories filtros={filtros.categorias} />
           {!isDiscussoes && (
-            <PeriodFilter>
+            <div className="flex items-center gap-1.5 flex-wrap">
               {PERIODS.map(({ id, label }) => (
-                <PeriodChip
+                <button
                   key={id}
-                  $active={period === id}
                   onClick={() => setPeriod(id)}
+                  className={`px-3 py-1 rounded-full text-[12px] cursor-pointer transition-all duration-150 border ${
+                    period === id
+                      ? "border-[#233DFF] bg-brand-light text-brand font-semibold"
+                      : "border-black/[0.08] bg-transparent text-[#6E6E73] font-normal hover:border-brand/[0.4] hover:text-brand hover:bg-brand-light"
+                  }`}
                 >
                   {label}
-                </PeriodChip>
+                </button>
               ))}
-            </PeriodFilter>
+            </div>
           )}
-        </SearchArea>
-      </PageHeader>
+        </div>
+      </header>
 
-      <PageMain>
-        <FeedColumn>
-          <SectionTabs>
+      {/* Main content */}
+      <div className="flex gap-5 items-start">
+
+        {/* Feed column */}
+        <div className="flex-1 min-w-0 flex flex-col gap-3.5">
+
+          {/* Section tabs */}
+          <div className="flex items-center gap-0.5 bg-white border border-black/[0.07] rounded-xl p-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
             {SECTIONS.map(({ id, label, icon: Icon }) => (
-              <SectionTab
+              <button
                 key={id}
-                $active={activeSection === id}
                 onClick={() => setActiveSection(id)}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 border-0 rounded-lg text-[13px] font-medium cursor-pointer transition-all duration-150 whitespace-nowrap tracking-[-0.01em] ${
+                  activeSection === id
+                    ? "bg-[#233DFF] text-white shadow-[0_2px_8px_rgba(35,61,255,0.22)]"
+                    : "bg-transparent text-[#6E6E73] hover:bg-[#F5F5F7] hover:text-[#1D1D1F]"
+                }`}
               >
                 <Icon size={14} />
                 {label}
                 {sectionCounts[id] > 0 && (
-                  <SectionCount $active={activeSection === id}>
+                  <span
+                    className={`inline-flex items-center justify-center min-w-[17px] h-[17px] px-1 rounded-full text-[10px] font-bold ${
+                      activeSection === id
+                        ? "bg-white/20 text-white"
+                        : "bg-[#F5F5F7] text-[#AEAEB2]"
+                    }`}
+                  >
                     {sectionCounts[id]}
-                  </SectionCount>
+                  </span>
                 )}
-              </SectionTab>
+              </button>
             ))}
-          </SectionTabs>
+          </div>
 
-          <SectionLabel>
+          {/* Section label */}
+          <p className="text-[11px] font-semibold text-[#AEAEB2] tracking-[0.06em] uppercase px-0.5">
             {SECTIONS.find((s) => s.id === activeSection)?.label}
             {activeSection === "discussoes"
               ? " — dúvidas operacionais sem resposta"
@@ -214,46 +212,56 @@ export default function Feed() {
               : activeSection === "forks" && sectionFlows.length === 0 && !loading
               ? " — nenhum flow derivado ainda"
               : ""}
-          </SectionLabel>
+          </p>
 
-          <FlowList>
+          {/* Flow list */}
+          <div className="flex flex-col gap-3.5">
             {loading && !isDiscussoes ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <SkeletonCard key={i}>
-                  <SkeletonLine $w="40%" $h="12px" />
-                  <SkeletonLine $w="70%" $h="18px" />
-                  <SkeletonLine $w="90%" $h="13px" />
-                  <SkeletonLine $w="55%" $h="13px" />
-                </SkeletonCard>
+                <div
+                  key={i}
+                  className="bg-white border border-black/[0.07] rounded-[14px] p-5 flex flex-col gap-3 shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
+                >
+                  {[
+                    { w: "40%", h: "12px" },
+                    { w: "70%", h: "18px" },
+                    { w: "90%", h: "13px" },
+                    { w: "55%", h: "13px" },
+                  ].map((line, j) => (
+                    <div
+                      key={j}
+                      style={{ width: line.w, height: line.h }}
+                      className="rounded-md bg-[#F5F5F7] animate-pulse"
+                    />
+                  ))}
+                </div>
               ))
             ) : displayItems.length > 0 ? (
               <>
                 {isDiscussoes
-                  ? displayItems.map((post) => (
-                      <DiscussaoCard post={post} key={post.id} />
-                    ))
-                  : displayItems.map((flow) => (
-                      <FlowCard flow={flow} key={flow.id} />
-                    ))}
+                  ? displayItems.map((post) => <DiscussaoCard post={post} key={post.id} />)
+                  : displayItems.map((flow) => <FlowCard flow={flow} key={flow.id} />)}
                 {hasMore && (
-                  <LoadMoreButton
+                  <button
                     onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                    className="w-full py-2.5 border border-dashed border-black/[0.10] rounded-[10px] bg-transparent text-[#6E6E73] text-[13px] font-medium cursor-pointer hover:border-[#233DFF]/40 hover:text-[#233DFF] hover:bg-brand-light transition-all duration-150 tracking-[-0.01em]"
                   >
                     Carregar mais
-                  </LoadMoreButton>
+                  </button>
                 )}
               </>
             ) : (
               <FlowsNotFound />
             )}
-          </FlowList>
-        </FeedColumn>
+          </div>
+        </div>
 
-        <SidebarColumn>
+        {/* Right sidebar */}
+        <aside className="w-[276px] flex-shrink-0 hidden lg:flex flex-col gap-3.5 sticky top-7">
           <TrendingBoard />
           <StatisticsBoard />
-        </SidebarColumn>
-      </PageMain>
-    </PageContainer>
+        </aside>
+      </div>
+    </div>
   );
 }

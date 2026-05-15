@@ -12,48 +12,6 @@ import {
 import { toast } from "sonner";
 import api from "../../services/api";
 
-import {
-  PageContainer,
-  GreetingCard,
-  GreetingLeft,
-  Avatar,
-  GreetingText,
-  GreetingTitle,
-  GreetingMeta,
-  GreetingSince,
-  CreateButton,
-  StatsGrid,
-  StatCard,
-  StatIconWrap,
-  StatValue,
-  StatLabel,
-  MainGrid,
-  SectionCard,
-  SectionHeader,
-  SectionTitle,
-  SectionLink,
-  FlowList,
-  FlowItem,
-  FlowItemInfo,
-  FlowItemTitle,
-  FlowItemMeta,
-  StatusDot,
-  FlowActions,
-  ActionBtn,
-  ActivityList,
-  ActivityItem,
-  ActivityIcon,
-  ActivityBody,
-  ActivityText,
-  ActivityFlow,
-  ActivityTime,
-  EmptyState,
-  EmptyText,
-  EmptyAction,
-  SkeletonCard,
-  SkeletonLine,
-} from "./style";
-
 const getGreeting = () => {
   const h = new Date().getHours();
   if (h >= 6 && h < 12) return "Bom dia";
@@ -70,10 +28,7 @@ const getIniciais = (nome) => {
 
 const memberSince = (date) => {
   if (!date) return "";
-  return new Date(date).toLocaleDateString("pt-BR", {
-    month: "long",
-    year: "numeric",
-  });
+  return new Date(date).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 };
 
 const timeAgo = (date) => {
@@ -88,11 +43,34 @@ const timeAgo = (date) => {
   return `${Math.floor(d / 7)}sem atrás`;
 };
 
-const STATUS_LABELS = {
-  publicado: "Publicado",
-  rascunho: "Rascunho",
-  arquivado: "Arquivado",
+const STATUS_LABELS = { publicado: "Publicado", rascunho: "Rascunho", arquivado: "Arquivado" };
+
+const STATUS_DOT = {
+  publicado: "bg-emerald-500",
+  rascunho: "bg-amber-400",
+  arquivado: "bg-[#AEAEB2]",
 };
+
+const STAT_ICON_COLORS = {
+  primary:   "bg-brand-light text-brand",
+  secondary: "bg-purple-50 text-purple-600",
+  success:   "bg-emerald-50 text-emerald-600",
+  warning:   "bg-amber-50 text-amber-500",
+};
+
+const ACTIVITY_ICON_COLORS = {
+  fork:       "bg-purple-50 text-purple-600",
+  comentario: "bg-brand-light text-brand",
+};
+
+function SkeletonLine({ w = "100%", h = "14px", radius = "6px" }) {
+  return (
+    <div
+      style={{ width: w, height: h, borderRadius: radius }}
+      className="bg-[#F5F5F7] animate-pulse"
+    />
+  );
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -109,35 +87,31 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <PageContainer>
-        <SkeletonCard>
-          <SkeletonLine $w="40%" $h="20px" />
-          <SkeletonLine $w="25%" $h="13px" />
-        </SkeletonCard>
-        <StatsGrid>
+      <div className="flex flex-col p-7 gap-5 min-h-screen">
+        <div className="bg-white border border-black/[0.07] rounded-2xl p-6 flex flex-col gap-3 shadow-card">
+          <SkeletonLine w="40%" h="20px" />
+          <SkeletonLine w="25%" h="13px" />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
           {Array.from({ length: 4 }).map((_, i) => (
-            <SkeletonCard key={i}>
-              <SkeletonLine $w="32px" $h="32px" />
-              <SkeletonLine $w="50%" $h="28px" />
-              <SkeletonLine $w="70%" $h="12px" />
-            </SkeletonCard>
+            <div key={i} className="bg-white border border-black/[0.07] rounded-2xl p-5 flex flex-col gap-3 shadow-card">
+              <SkeletonLine w="32px" h="32px" radius="8px" />
+              <SkeletonLine w="50%" h="28px" />
+              <SkeletonLine w="70%" h="12px" />
+            </div>
           ))}
-        </StatsGrid>
-        <MainGrid>
-          <SkeletonCard $h="320px">
-            <SkeletonLine $w="45%" $h="14px" />
-            {Array.from({ length: 4 }).map((_, i) => (
-              <SkeletonLine key={i} $w="100%" $h="13px" />
-            ))}
-          </SkeletonCard>
-          <SkeletonCard $h="320px">
-            <SkeletonLine $w="55%" $h="14px" />
-            {Array.from({ length: 5 }).map((_, i) => (
-              <SkeletonLine key={i} $w="100%" $h="12px" />
-            ))}
-          </SkeletonCard>
-        </MainGrid>
-      </PageContainer>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {[0, 1].map((i) => (
+            <div key={i} className="bg-white border border-black/[0.07] rounded-2xl p-6 flex flex-col gap-3 shadow-card min-h-[320px]">
+              <SkeletonLine w="45%" h="14px" />
+              {Array.from({ length: 4 }).map((_, j) => (
+                <SkeletonLine key={j} h="13px" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -146,168 +120,179 @@ export default function Dashboard() {
   const { usuario, stats, flows_recentes, atividade_recente } = data;
 
   return (
-    <PageContainer>
-      {/* SAUDAÇÃO */}
-      <GreetingCard>
-        <GreetingLeft>
-          <Avatar>{getIniciais(usuario.nome)}</Avatar>
-          <GreetingText>
-            <GreetingTitle>
+    <div className="flex flex-col p-7 gap-5 min-h-screen">
+
+      {/* Greeting card */}
+      <div className="flex items-center justify-between gap-4 bg-white border border-black/[0.07] rounded-2xl p-6 shadow-card">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 flex-shrink-0 rounded-full bg-brand-light border border-brand/[0.15] text-brand font-bold text-[16px] flex items-center justify-center">
+            {getIniciais(usuario.nome)}
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <h1 className="font-serif text-[22px] font-bold text-[#1D1D1F] tracking-[-0.02em]">
               {getGreeting()}, {usuario.nome?.split(" ")[0]}
-            </GreetingTitle>
+            </h1>
             {(usuario.cargo || usuario.empresa) && (
-              <GreetingMeta>
+              <p className="text-[13px] text-[#6E6E73] tracking-[-0.01em]">
                 {[usuario.cargo, usuario.empresa].filter(Boolean).join(" · ")}
-              </GreetingMeta>
+              </p>
             )}
             {usuario.criado_em && (
-              <GreetingSince>
+              <p className="text-[12px] text-[#AEAEB2]">
                 Membro desde {memberSince(usuario.criado_em)}
-              </GreetingSince>
+              </p>
             )}
-          </GreetingText>
-        </GreetingLeft>
-        <CreateButton onClick={() => navigate("/criar-flow")}>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate("/criar-flow")}
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#233DFF] hover:bg-[#1A2ECC] text-white border-0 rounded-[10px] text-[13.5px] font-semibold cursor-pointer tracking-[-0.01em] transition-all duration-150 shadow-brand hover:shadow-brand-hover hover:-translate-y-px active:translate-y-0 flex-shrink-0"
+        >
           <Plus size={14} strokeWidth={2.5} />
           Criar Flow
-        </CreateButton>
-      </GreetingCard>
+        </button>
+      </div>
 
-      {/* STATS */}
-      <StatsGrid>
-        <StatCard>
-          <StatIconWrap $color="primary">
-            <GitBranch size={16} />
-          </StatIconWrap>
-          <StatValue>{stats.flows_criados}</StatValue>
-          <StatLabel>Flows criados</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatIconWrap $color="secondary">
-            <Eye size={16} />
-          </StatIconWrap>
-          <StatValue>{stats.visualizacoes_totais.toLocaleString("pt-BR")}</StatValue>
-          <StatLabel>Visualizações totais</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatIconWrap $color="success">
-            <Heart size={16} />
-          </StatIconWrap>
-          <StatValue>{stats.curtidas_recebidas}</StatValue>
-          <StatLabel>Curtidas recebidas</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatIconWrap $color="warning">
-            <GitFork size={16} />
-          </StatIconWrap>
-          <StatValue>{stats.forks_recebidos}</StatValue>
-          <StatLabel>Forks recebidos</StatLabel>
-        </StatCard>
-      </StatsGrid>
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {[
+          { icon: GitBranch, value: stats.flows_criados, label: "Flows criados", color: "primary" },
+          { icon: Eye, value: stats.visualizacoes_totais.toLocaleString("pt-BR"), label: "Visualizações totais", color: "secondary" },
+          { icon: Heart, value: stats.curtidas_recebidas, label: "Curtidas recebidas", color: "success" },
+          { icon: GitFork, value: stats.forks_recebidos, label: "Forks recebidos", color: "warning" },
+        ].map(({ icon: Icon, value, label, color }) => (
+          <div key={label} className="bg-white border border-black/[0.07] rounded-2xl p-5 flex flex-col gap-2 shadow-card">
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${STAT_ICON_COLORS[color]}`}>
+              <Icon size={16} />
+            </div>
+            <span className="font-serif text-[28px] font-bold text-[#1D1D1F] leading-none tracking-[-0.02em]">
+              {value}
+            </span>
+            <span className="text-[12.5px] text-[#6E6E73] tracking-[-0.01em]">{label}</span>
+          </div>
+        ))}
+      </div>
 
-      {/* MAIN GRID */}
-      <MainGrid>
-        {/* FLOWS RECENTES */}
-        <SectionCard>
-          <SectionHeader>
-            <SectionTitle>Meus Flows Recentes</SectionTitle>
+      {/* Main grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        {/* Recent flows */}
+        <div className="bg-white border border-black/[0.07] rounded-2xl p-6 flex flex-col gap-4 shadow-card">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[15px] font-semibold text-[#1D1D1F] tracking-[-0.01em]">
+              Meus Flows Recentes
+            </h2>
             {stats.flows_criados > 5 && (
-              <SectionLink onClick={() => navigate("/perfil")}>
+              <button
+                onClick={() => navigate("/perfil")}
+                className="text-[12px] text-brand font-medium hover:underline bg-transparent border-0 cursor-pointer p-0"
+              >
                 Ver todos
-              </SectionLink>
+              </button>
             )}
-          </SectionHeader>
+          </div>
 
           {flows_recentes.length === 0 ? (
-            <EmptyState>
-              <EmptyText>Você ainda não criou nenhum flow</EmptyText>
-              <EmptyAction onClick={() => navigate("/criar-flow")}>
+            <div className="flex flex-col items-center justify-center py-10 gap-2">
+              <p className="text-[13px] text-[#AEAEB2]">Você ainda não criou nenhum flow</p>
+              <button
+                onClick={() => navigate("/criar-flow")}
+                className="text-[13px] text-brand font-medium hover:underline bg-transparent border-0 cursor-pointer p-0"
+              >
                 Criar meu primeiro flow →
-              </EmptyAction>
-            </EmptyState>
+              </button>
+            </div>
           ) : (
-            <FlowList>
+            <div className="flex flex-col divide-y divide-black/[0.05]">
               {flows_recentes.map((flow) => (
-                <FlowItem key={flow.id}>
-                  <StatusDot $status={flow.status} title={STATUS_LABELS[flow.status]} />
-                  <FlowItemInfo>
-                    <FlowItemTitle>{flow.titulo}</FlowItemTitle>
-                    <FlowItemMeta>
-                      {[flow.categoria, timeAgo(flow.criado_em)]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </FlowItemMeta>
-                  </FlowItemInfo>
-                  <FlowActions>
-                    <ActionBtn onClick={() => navigate(`/editar-flow/${flow.id}`)}>
-                      <Pencil size={11} style={{ marginRight: 3 }} />
+                <div key={flow.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${STATUS_DOT[flow.status] || "bg-[#AEAEB2]"}`}
+                    title={STATUS_LABELS[flow.status]}
+                  />
+                  <div className="flex flex-col flex-1 min-w-0 gap-px">
+                    <span className="text-[13px] font-medium text-[#1D1D1F] truncate tracking-[-0.01em]">
+                      {flow.titulo}
+                    </span>
+                    <span className="text-[11.5px] text-[#AEAEB2]">
+                      {[flow.categoria, timeAgo(flow.criado_em)].filter(Boolean).join(" · ")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button
+                      onClick={() => navigate(`/editar-flow/${flow.id}`)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11.5px] font-medium text-[#6E6E73] bg-[#F5F5F7] hover:bg-[#EBEBED] border-0 cursor-pointer transition-colors"
+                    >
+                      <Pencil size={11} />
                       Editar
-                    </ActionBtn>
-                    <ActionBtn onClick={() => navigate(`/flow/${flow.id}`)}>
-                      <Eye size={11} style={{ marginRight: 3 }} />
+                    </button>
+                    <button
+                      onClick={() => navigate(`/flow/${flow.id}`)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11.5px] font-medium text-[#6E6E73] bg-[#F5F5F7] hover:bg-[#EBEBED] border-0 cursor-pointer transition-colors"
+                    >
+                      <Eye size={11} />
                       Ver
-                    </ActionBtn>
-                  </FlowActions>
-                </FlowItem>
+                    </button>
+                  </div>
+                </div>
               ))}
-            </FlowList>
+            </div>
           )}
-        </SectionCard>
+        </div>
 
-        {/* ATIVIDADE RECENTE */}
-        <SectionCard>
-          <SectionHeader>
-            <SectionTitle>Atividade Recente</SectionTitle>
-          </SectionHeader>
+        {/* Recent activity */}
+        <div className="bg-white border border-black/[0.07] rounded-2xl p-6 flex flex-col gap-4 shadow-card">
+          <h2 className="text-[15px] font-semibold text-[#1D1D1F] tracking-[-0.01em]">
+            Atividade Recente
+          </h2>
 
           {atividade_recente.length === 0 ? (
-            <EmptyState>
-              <EmptyText>
+            <div className="flex flex-col items-center justify-center py-10 gap-2">
+              <p className="text-[13px] text-[#AEAEB2]">
                 {stats.flows_criados === 0
                   ? "Crie flows para receber atividade"
                   : "Nenhuma atividade recente"}
-              </EmptyText>
-            </EmptyState>
+              </p>
+            </div>
           ) : (
-            <ActivityList>
+            <div className="flex flex-col gap-3">
               {atividade_recente.map((item, i) => (
-                <ActivityItem key={i}>
-                  <ActivityIcon $tipo={item.tipo}>
+                <div key={i} className="flex items-start gap-3">
+                  <div
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      ACTIVITY_ICON_COLORS[item.tipo] || "bg-[#F5F5F7] text-[#6E6E73]"
+                    }`}
+                  >
                     {item.tipo === "fork" ? (
                       <GitFork size={14} />
                     ) : (
                       <MessageCircle size={14} />
                     )}
-                  </ActivityIcon>
-                  <ActivityBody>
-                    <ActivityText>
-                      <strong>{item.usuario_nome}</strong>{" "}
+                  </div>
+                  <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                    <p className="text-[13px] text-[#1D1D1F] leading-[1.5]">
+                      <strong className="font-semibold">{item.usuario_nome}</strong>{" "}
                       {item.tipo === "fork" ? "derivou" : "comentou em"}{" "}
-                      <ActivityFlow
+                      <button
                         onClick={() => navigate(`/flow/${item.flow_id}`)}
-                        style={{ cursor: "pointer" }}
+                        className="text-brand font-medium hover:underline bg-transparent border-0 cursor-pointer p-0 text-[13px]"
                       >
                         {item.flow_titulo}
-                      </ActivityFlow>
+                      </button>
                       {item.tipo === "comentario" && item.mensagem && (
-                        <>
-                          {" "}
-                          <span
-                            style={{ fontWeight: 400, color: "inherit", opacity: 0.7 }}
-                          >
-                            · "{item.mensagem}"
-                          </span>
-                        </>
+                        <span className="text-[#6E6E73] font-normal"> · "{item.mensagem}"</span>
                       )}
-                    </ActivityText>
-                    <ActivityTime>{timeAgo(item.criado_em)}</ActivityTime>
-                  </ActivityBody>
-                </ActivityItem>
+                    </p>
+                    <span className="text-[11.5px] text-[#AEAEB2]">
+                      {timeAgo(item.criado_em)}
+                    </span>
+                  </div>
+                </div>
               ))}
-            </ActivityList>
+            </div>
           )}
-        </SectionCard>
-      </MainGrid>
-    </PageContainer>
+        </div>
+      </div>
+    </div>
   );
 }

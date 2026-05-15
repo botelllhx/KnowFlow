@@ -7,52 +7,12 @@ import FlowCard from "../../components/FlowCard";
 import { CommunityPost } from "../../components/CommunityPost";
 import { useFlowStore } from "../../store/flowStore";
 
-import {
-  PageContainer,
-  ProfileCard,
-  ProfileTop,
-  AvatarWrap,
-  AvatarCircle,
-  UserInfo,
-  UserName,
-  UserRole,
-  UserMeta,
-  MetaItem,
-  UserBio,
-  ButtonRow,
-  EditButton,
-  ShareButton,
-  StatsRow,
-  StatChip,
-  StatChipValue,
-  StatChipLabel,
-  EditForm,
-  FormGrid,
-  FormField,
-  FormLabel,
-  FormInput,
-  FormTextarea,
-  FormActions,
-  SaveBtn,
-  CancelBtn,
-  TabNav,
-  TabItem,
-  TabContent,
-  Section,
-  SectionTitle,
-  EmptyState,
-  EmptyText,
-  EmptyAction,
-  SkeletonCard,
-  SkeletonLine,
-} from "./style";
-
 const TABS = [
   { id: "overview", label: "Visão Geral" },
-  { id: "flows", label: "Meus Flows" },
-  { id: "forks", label: "Forks" },
-  { id: "salvos", label: "Salvos" },
-  { id: "posts", label: "Posts" },
+  { id: "flows",    label: "Meus Flows" },
+  { id: "forks",    label: "Forks" },
+  { id: "salvos",   label: "Salvos" },
+  { id: "posts",    label: "Posts" },
 ];
 
 const getIniciais = (nome) => {
@@ -64,10 +24,7 @@ const getIniciais = (nome) => {
 
 const memberSince = (date) => {
   if (!date) return "";
-  return new Date(date).toLocaleDateString("pt-BR", {
-    month: "long",
-    year: "numeric",
-  });
+  return new Date(date).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 };
 
 const timeAgo = (date) => {
@@ -82,6 +39,9 @@ const timeAgo = (date) => {
   return `${Math.floor(d / 7)}sem atrás`;
 };
 
+const inputCls =
+  "w-full text-[14px] text-[#1D1D1F] bg-[#F5F5F7] border border-black/[0.08] rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-[#233DFF] focus:ring-2 focus:ring-[rgba(35,61,255,0.12)] placeholder-[#AEAEB2] transition-all duration-150";
+
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -89,12 +49,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    nome: "",
-    cargo: "",
-    empresa: "",
-    descricao: "",
-  });
+  const [editForm, setEditForm] = useState({ nome: "", cargo: "", empresa: "", descricao: "" });
   const [saving, setSaving] = useState(false);
 
   const { flows, fetchFlows, loading: flowsLoading, savedPosts } = useFlowStore();
@@ -104,16 +59,9 @@ export default function Profile() {
       try {
         const { data } = await api.get("/usuario/me");
         setUser(data);
-        setEditForm({
-          nome: data.nome || "",
-          cargo: data.cargo || "",
-          empresa: data.empresa || "",
-          descricao: data.descricao || "",
-        });
+        setEditForm({ nome: data.nome || "", cargo: data.cargo || "", empresa: data.empresa || "", descricao: data.descricao || "" });
         await fetchFlows();
-        const postsRes = await api.get("/postagemcomunidade", {
-          params: { criado_por: data.id },
-        });
+        const postsRes = await api.get("/postagemcomunidade", { params: { criado_por: data.id } });
         const userId = data.id;
         setPosts(
           postsRes.data
@@ -122,13 +70,7 @@ export default function Profile() {
               id: p.id,
               title: p.titulo || "Sem título",
               content: p.conteudo || "",
-              author: {
-                name: p.usuario?.nome || data.nome,
-                initials: getIniciais(p.usuario?.nome || data.nome),
-                role: data.cargo || "Membro",
-                reputation: 0,
-                id: userId,
-              },
+              author: { name: p.usuario?.nome || data.nome, initials: getIniciais(p.usuario?.nome || data.nome), role: data.cargo || "Membro", reputation: 0, id: userId },
               type: p.tipo || "Discussão",
               category: p.categoria || "Geral",
               tags: Array.isArray(p.tags) ? p.tags : [],
@@ -152,40 +94,14 @@ export default function Profile() {
     load();
   }, [fetchFlows]);
 
-  const userFlows = useMemo(
-    () => (user ? flows.filter((f) => f.criado_por === user.id) : []),
-    [flows, user]
-  );
-
-  const userForks = useMemo(
-    () => userFlows.filter((f) => f.fork_de),
-    [userFlows]
-  );
-
-  const savedFlows = useMemo(
-    () => flows.filter((f) => savedPosts.includes(String(f.id))),
-    [flows, savedPosts]
-  );
-
+  const userFlows = useMemo(() => (user ? flows.filter((f) => f.criado_por === user.id) : []), [flows, user]);
+  const userForks = useMemo(() => userFlows.filter((f) => f.fork_de), [userFlows]);
+  const savedFlows = useMemo(() => flows.filter((f) => savedPosts.includes(String(f.id))), [flows, savedPosts]);
   const forksRecebidos = useMemo(() => {
     const myIds = new Set(userFlows.map((f) => String(f.id)));
     return flows.filter((f) => f.fork_de && myIds.has(String(f.fork_de))).length;
   }, [flows, userFlows]);
-
-  const visualizacoesTotais = useMemo(
-    () => userFlows.reduce((sum, f) => sum + (f.visualizacoes || 0), 0),
-    [userFlows]
-  );
-
-  const handleEdit = () => {
-    setEditForm({
-      nome: user.nome || "",
-      cargo: user.cargo || "",
-      empresa: user.empresa || "",
-      descricao: user.descricao || "",
-    });
-    setIsEditing(true);
-  };
+  const visualizacoesTotais = useMemo(() => userFlows.reduce((sum, f) => sum + (f.visualizacoes || 0), 0), [userFlows]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -213,295 +129,237 @@ export default function Profile() {
         if (type === "up") {
           return p.isUpvoted
             ? { ...p, upvotes: p.upvotes - 1, isUpvoted: false }
-            : {
-                ...p,
-                upvotes: p.upvotes + 1,
-                downvotes: p.isDownvoted ? p.downvotes - 1 : p.downvotes,
-                isUpvoted: true,
-                isDownvoted: false,
-              };
+            : { ...p, upvotes: p.upvotes + 1, downvotes: p.isDownvoted ? p.downvotes - 1 : p.downvotes, isUpvoted: true, isDownvoted: false };
         }
         return p.isDownvoted
           ? { ...p, downvotes: p.downvotes - 1, isDownvoted: false }
-          : {
-              ...p,
-              downvotes: p.downvotes + 1,
-              upvotes: p.isUpvoted ? p.upvotes - 1 : p.upvotes,
-              isDownvoted: true,
-              isUpvoted: false,
-            };
+          : { ...p, downvotes: p.downvotes + 1, upvotes: p.isUpvoted ? p.upvotes - 1 : p.upvotes, isDownvoted: true, isUpvoted: false };
       })
     );
   };
 
   const handleSavePost = (postId) => {
     const isSaved = posts.find((p) => p.id === postId)?.isSaved;
-    setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, isSaved: !p.isSaved } : p))
-    );
+    setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, isSaved: !p.isSaved } : p)));
     toast.success(isSaved ? "Post removido dos salvos!" : "Post salvo!");
   };
 
   if (loading || !user || flowsLoading) {
     return (
-      <PageContainer>
-        <SkeletonCard $h="220px">
-          <SkeletonLine $w="72px" $h="72px" $radius="50%" />
-          <SkeletonLine $w="200px" $h="20px" />
-          <SkeletonLine $w="140px" $h="13px" />
-          <SkeletonLine $w="300px" $h="12px" />
-        </SkeletonCard>
-        <SkeletonCard $h="60px" />
-        <SkeletonCard $h="280px" />
-      </PageContainer>
+      <div className="flex flex-col p-7 gap-5 min-h-screen">
+        {[220, 60, 280].map((h, i) => (
+          <div key={i} style={{ minHeight: h }} className="bg-white border border-black/[0.07] rounded-2xl p-6 flex flex-col gap-4 shadow-card">
+            <div className="w-full h-5 rounded-md bg-[#F5F5F7] animate-pulse" style={{ width: "45%" }} />
+            <div className="w-full h-3 rounded-md bg-[#F5F5F7] animate-pulse" style={{ width: "30%" }} />
+          </div>
+        ))}
+      </div>
     );
   }
 
   const tabLabel = (tab) => {
-    const counts = {
-      flows: userFlows.length,
-      forks: userForks.length,
-      salvos: savedFlows.length,
-      posts: posts.length,
-    };
+    const counts = { flows: userFlows.length, forks: userForks.length, salvos: savedFlows.length, posts: posts.length };
     const count = counts[tab.id];
     return count !== undefined ? `${tab.label} (${count})` : tab.label;
   };
 
+  const EmptyState = ({ text, action, actionLabel }) => (
+    <div className="flex flex-col items-center justify-center py-10 gap-2">
+      <p className="text-[13px] text-[#AEAEB2]">{text}</p>
+      {action && (
+        <button onClick={action} className="text-[13px] text-brand font-medium hover:underline bg-transparent border-0 cursor-pointer p-0">
+          {actionLabel}
+        </button>
+      )}
+    </div>
+  );
+
   return (
-    <PageContainer>
-      <ProfileCard>
+    <div className="flex flex-col p-7 gap-5 min-h-screen">
+
+      {/* Profile card */}
+      <div className="bg-white border border-black/[0.07] rounded-2xl p-6 flex flex-col gap-5 shadow-card">
         {isEditing ? (
-          <EditForm>
-            <FormGrid>
-              <FormField>
-                <FormLabel>Nome</FormLabel>
-                <FormInput
-                  value={editForm.nome}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, nome: e.target.value }))
-                  }
-                  placeholder="Seu nome"
-                />
-              </FormField>
-              <FormField>
-                <FormLabel>Cargo</FormLabel>
-                <FormInput
-                  value={editForm.cargo}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, cargo: e.target.value }))
-                  }
-                  placeholder="Ex: Product Designer"
-                />
-              </FormField>
-              <FormField>
-                <FormLabel>Empresa</FormLabel>
-                <FormInput
-                  value={editForm.empresa}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, empresa: e.target.value }))
-                  }
-                  placeholder="Ex: Acme Corp"
-                />
-              </FormField>
-            </FormGrid>
-            <FormField>
-              <FormLabel>Bio</FormLabel>
-              <FormTextarea
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { key: "nome", label: "Nome", placeholder: "Seu nome" },
+                { key: "cargo", label: "Cargo", placeholder: "Ex: Product Designer" },
+                { key: "empresa", label: "Empresa", placeholder: "Ex: Acme Corp" },
+              ].map(({ key, label, placeholder }) => (
+                <div key={key} className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-medium text-[#1D1D1F] tracking-[-0.01em]">{label}</label>
+                  <input
+                    value={editForm[key]}
+                    onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))}
+                    placeholder={placeholder}
+                    className={inputCls}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] font-medium text-[#1D1D1F] tracking-[-0.01em]">Bio</label>
+              <textarea
                 value={editForm.descricao}
-                onChange={(e) =>
-                  setEditForm((f) => ({ ...f, descricao: e.target.value }))
-                }
+                onChange={(e) => setEditForm((f) => ({ ...f, descricao: e.target.value }))}
                 placeholder="Uma breve descrição sobre você..."
                 rows={3}
+                className={`${inputCls} resize-none`}
               />
-            </FormField>
-            <FormActions>
-              <SaveBtn onClick={handleSave} disabled={saving}>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="px-5 py-2.5 bg-[#233DFF] hover:bg-[#1A2ECC] disabled:bg-[#AEAEB2] text-white text-[13.5px] font-semibold rounded-xl border-0 cursor-pointer transition-all duration-150"
+              >
                 {saving ? "Salvando..." : "Salvar"}
-              </SaveBtn>
-              <CancelBtn onClick={() => setIsEditing(false)}>Cancelar</CancelBtn>
-            </FormActions>
-          </EditForm>
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="px-5 py-2.5 bg-[#F5F5F7] hover:bg-[#EBEBED] text-[#1D1D1F] text-[13.5px] font-medium rounded-xl border-0 cursor-pointer transition-all duration-150"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
         ) : (
-          <ProfileTop>
-            <AvatarWrap>
-              <AvatarCircle>{getIniciais(user.nome)}</AvatarCircle>
-            </AvatarWrap>
-            <UserInfo>
-              <UserName>{user.nome}</UserName>
+          <div className="flex items-start gap-5">
+            <div className="w-16 h-16 flex-shrink-0 rounded-full bg-brand-light border-2 border-brand/[0.20] text-brand font-bold text-[20px] flex items-center justify-center">
+              {getIniciais(user.nome)}
+            </div>
+            <div className="flex flex-col flex-1 min-w-0 gap-1">
+              <h1 className="font-serif text-[22px] font-bold text-[#1D1D1F] tracking-[-0.02em]">
+                {user.nome}
+              </h1>
               {(user.cargo || user.empresa) && (
-                <UserRole>
+                <p className="text-[14px] text-[#6E6E73] tracking-[-0.01em]">
                   {[user.cargo, user.empresa].filter(Boolean).join(" · ")}
-                </UserRole>
+                </p>
               )}
               {user.criado_em && (
-                <UserMeta>
-                  <MetaItem>
-                    <Calendar size={12} />
-                    Membro desde {memberSince(user.criado_em)}
-                  </MetaItem>
-                </UserMeta>
+                <p className="flex items-center gap-1.5 text-[12px] text-[#AEAEB2] mt-0.5">
+                  <Calendar size={12} />
+                  Membro desde {memberSince(user.criado_em)}
+                </p>
               )}
-              {user.descricao && <UserBio>{user.descricao}</UserBio>}
-            </UserInfo>
-            <ButtonRow>
-              <EditButton onClick={handleEdit}>
+              {user.descricao && (
+                <p className="text-[13.5px] text-[#6E6E73] leading-relaxed mt-1">
+                  {user.descricao}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-black/[0.08] bg-white hover:bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] cursor-pointer transition-colors"
+              >
                 <Edit2 size={13} />
                 Editar
-              </EditButton>
-              <ShareButton onClick={handleShare}>
+              </button>
+              <button
+                onClick={handleShare}
+                className="w-9 h-9 rounded-xl border border-black/[0.08] bg-white hover:bg-[#F5F5F7] flex items-center justify-center text-[#6E6E73] cursor-pointer transition-colors"
+              >
                 <Share2 size={14} />
-              </ShareButton>
-            </ButtonRow>
-          </ProfileTop>
+              </button>
+            </div>
+          </div>
         )}
 
-        <StatsRow>
-          <StatChip>
-            <StatChipValue>{userFlows.length}</StatChipValue>
-            <StatChipLabel>Flows criados</StatChipLabel>
-          </StatChip>
-          <StatChip>
-            <StatChipValue>
-              {visualizacoesTotais.toLocaleString("pt-BR")}
-            </StatChipValue>
-            <StatChipLabel>Visualizações</StatChipLabel>
-          </StatChip>
-          <StatChip>
-            <StatChipValue>{forksRecebidos}</StatChipValue>
-            <StatChipLabel>Forks recebidos</StatChipLabel>
-          </StatChip>
-          <StatChip>
-            <StatChipValue>{savedFlows.length}</StatChipValue>
-            <StatChipLabel>Flows salvos</StatChipLabel>
-          </StatChip>
-        </StatsRow>
-      </ProfileCard>
+        {/* Stats row */}
+        <div className="flex items-center gap-4 pt-1 border-t border-black/[0.05]">
+          {[
+            { value: userFlows.length, label: "Flows criados" },
+            { value: visualizacoesTotais.toLocaleString("pt-BR"), label: "Visualizações" },
+            { value: forksRecebidos, label: "Forks recebidos" },
+            { value: savedFlows.length, label: "Flows salvos" },
+          ].map(({ value, label }) => (
+            <div key={label} className="flex flex-col items-center gap-0.5 flex-1">
+              <span className="font-serif text-[20px] font-bold text-[#1D1D1F] tracking-[-0.02em]">
+                {value}
+              </span>
+              <span className="text-[11.5px] text-[#AEAEB2]">{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      <TabNav>
+      {/* Tabs */}
+      <div className="flex items-center gap-0.5 bg-white border border-black/[0.07] rounded-xl p-1 shadow-[0_1px_4px_rgba(0,0,0,0.04)] overflow-x-auto [scrollbar-width:none]">
         {TABS.map((t) => (
-          <TabItem
+          <button
             key={t.id}
-            $active={activeTab === t.id}
             onClick={() => setActiveTab(t.id)}
+            className={`flex-1 px-4 py-2 rounded-lg text-[13px] font-medium cursor-pointer border-0 transition-all duration-150 whitespace-nowrap tracking-[-0.01em] ${
+              activeTab === t.id
+                ? "bg-[#233DFF] text-white shadow-[0_2px_8px_rgba(35,61,255,0.22)]"
+                : "bg-transparent text-[#6E6E73] hover:bg-[#F5F5F7] hover:text-[#1D1D1F]"
+            }`}
           >
             {tabLabel(t)}
-          </TabItem>
+          </button>
         ))}
-      </TabNav>
+      </div>
 
-      <TabContent>
+      {/* Tab content */}
+      <div className="flex flex-col gap-3.5">
         {activeTab === "overview" && (
           <>
-            <Section>
-              <SectionTitle>Flows Recentes</SectionTitle>
+            <div className="flex flex-col gap-3.5">
+              <h2 className="text-[13px] font-semibold text-[#AEAEB2] tracking-[0.06em] uppercase">Flows Recentes</h2>
               {userFlows.length === 0 ? (
-                <EmptyState>
-                  <EmptyText>Nenhum flow criado ainda</EmptyText>
-                  <EmptyAction onClick={() => navigate("/criar-flow")}>
-                    Criar meu primeiro flow →
-                  </EmptyAction>
-                </EmptyState>
+                <EmptyState text="Nenhum flow criado ainda" action={() => navigate("/criar-flow")} actionLabel="Criar meu primeiro flow →" />
               ) : (
-                userFlows
-                  .slice(0, 3)
-                  .map((flow) => (
-                    <FlowCard key={flow.id} flow={flow} userID={user.id} />
-                  ))
+                userFlows.slice(0, 3).map((flow) => <FlowCard key={flow.id} flow={flow} userID={user.id} />)
               )}
-            </Section>
+            </div>
             {posts.length > 0 && (
-              <Section>
-                <SectionTitle>Posts Recentes</SectionTitle>
+              <div className="flex flex-col gap-3.5 mt-2">
+                <h2 className="text-[13px] font-semibold text-[#AEAEB2] tracking-[0.06em] uppercase">Posts Recentes</h2>
                 {posts.slice(0, 2).map((post) => (
-                  <CommunityPost
-                    key={post.id}
-                    post={post}
-                    onVote={handleVote}
-                    onSave={handleSavePost}
-                    currentUserId={user.id}
-                  />
+                  <CommunityPost key={post.id} post={post} onVote={handleVote} onSave={handleSavePost} currentUserId={user.id} />
                 ))}
-              </Section>
+              </div>
             )}
           </>
         )}
 
         {activeTab === "flows" && (
-          <Section>
-            {userFlows.length === 0 ? (
-              <EmptyState>
-                <EmptyText>Você ainda não criou nenhum flow</EmptyText>
-                <EmptyAction onClick={() => navigate("/criar-flow")}>
-                  Criar flow →
-                </EmptyAction>
-              </EmptyState>
-            ) : (
-              userFlows.map((flow) => (
-                <FlowCard key={flow.id} flow={flow} userID={user.id} />
-              ))
-            )}
-          </Section>
+          userFlows.length === 0 ? (
+            <EmptyState text="Você ainda não criou nenhum flow" action={() => navigate("/criar-flow")} actionLabel="Criar flow →" />
+          ) : (
+            userFlows.map((flow) => <FlowCard key={flow.id} flow={flow} userID={user.id} />)
+          )
         )}
 
         {activeTab === "forks" && (
-          <Section>
-            {userForks.length === 0 ? (
-              <EmptyState>
-                <EmptyText>Você ainda não derivou nenhum flow</EmptyText>
-                <EmptyAction onClick={() => navigate("/feed")}>
-                  Explorar flows →
-                </EmptyAction>
-              </EmptyState>
-            ) : (
-              userForks.map((flow) => (
-                <FlowCard key={flow.id} flow={flow} userID={user.id} />
-              ))
-            )}
-          </Section>
+          userForks.length === 0 ? (
+            <EmptyState text="Você ainda não derivou nenhum flow" action={() => navigate("/feed")} actionLabel="Explorar flows →" />
+          ) : (
+            userForks.map((flow) => <FlowCard key={flow.id} flow={flow} userID={user.id} />)
+          )
         )}
 
         {activeTab === "salvos" && (
-          <Section>
-            {savedFlows.length === 0 ? (
-              <EmptyState>
-                <EmptyText>Nenhum flow salvo ainda</EmptyText>
-                <EmptyAction onClick={() => navigate("/feed")}>
-                  Explorar flows →
-                </EmptyAction>
-              </EmptyState>
-            ) : (
-              savedFlows.map((flow) => (
-                <FlowCard key={flow.id} flow={flow} userID={user.id} />
-              ))
-            )}
-          </Section>
+          savedFlows.length === 0 ? (
+            <EmptyState text="Nenhum flow salvo ainda" action={() => navigate("/feed")} actionLabel="Explorar flows →" />
+          ) : (
+            savedFlows.map((flow) => <FlowCard key={flow.id} flow={flow} userID={user.id} />)
+          )
         )}
 
         {activeTab === "posts" && (
-          <Section>
-            {posts.length === 0 ? (
-              <EmptyState>
-                <EmptyText>Nenhum post criado ainda</EmptyText>
-                <EmptyAction onClick={() => navigate("/comunidade")}>
-                  Ir para comunidade →
-                </EmptyAction>
-              </EmptyState>
-            ) : (
-              posts.map((post) => (
-                <CommunityPost
-                  key={post.id}
-                  post={post}
-                  onVote={handleVote}
-                  onSave={handleSavePost}
-                  currentUserId={user.id}
-                />
-              ))
-            )}
-          </Section>
+          posts.length === 0 ? (
+            <EmptyState text="Nenhum post criado ainda" action={() => navigate("/comunidade")} actionLabel="Ir para comunidade →" />
+          ) : (
+            posts.map((post) => (
+              <CommunityPost key={post.id} post={post} onVote={handleVote} onSave={handleSavePost} currentUserId={user.id} />
+            ))
+          )
         )}
-      </TabContent>
-    </PageContainer>
+      </div>
+    </div>
   );
 }
